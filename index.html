@@ -88,12 +88,9 @@
       uniform sampler2D u_tex;
 
       void main() {
-        vec4 color = texture2D(u_tex, v_texcoord);
-        // gl_FragColor = u_color;
-        // gl_FragColor = v_color;
-        //  gl_FragColor = vec4(color.rgb, 1);
-        vec3 rgb = color.rgb*color.a + u_color.rgb*(1.0 - color.a);
-        gl_FragColor = vec4(rgb, 1);
+       // vec4 color = texture2D(u_tex, v_texcoord);
+       // vec3 rgb = color.rgb*color.a + u_color.rgb*(1.0 - color.a);
+       // gl_FragColor = vec4(rgb, 1);
       }	
 	</script>
 
