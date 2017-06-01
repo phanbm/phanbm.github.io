@@ -33,6 +33,8 @@
 
 <body bgcolor="#ffffff">
 
+	<canvas id="c" width="853" height="400"></canvas>
+
 	<h1><center>Home Page of Bryan Minh-Triet Phan</center></h1>
 
 	<a href="https://github.com/phanbm">My GitHub Profile</a>
@@ -55,6 +57,143 @@
 		<br>
 		Last Modified:  June 1, 2017 at 5:29 PM
 	</i>
+
+	<script id="vs" type="x-shader/x-vertex">
+		uniform mat4 u_modelView;
+      
+      	attribute vec4 a_position;
+      	attribute vec4 a_color;
+      	attribute vec2 a_texcoord;
+      	varying vec4 v_color;  
+
+      	varying vec2 v_texcoord;
+      
+
+      	void main() {
+        	//gl_Position = a_position;
+        	gl_Position = u_modelView * a_position;
+        	v_color = a_color; //set per vertex and read per pixel -> this moves the value forward to be used by the next shader
+        	v_texcoord = a_texcoord;
+      	}
+	</script>
+
+
+	<script id="fs" type="x-shader/x-fragment">
+	//fragment shader 1: uses textures
+      precision mediump float;
+
+      uniform vec4 u_color;
+      varying vec4 v_color;
+      varying vec2 v_texcoord;
+      uniform sampler2D u_tex;
+
+      void main() {
+        vec4 color = texture2D(u_tex, v_texcoord);
+        // gl_FragColor = u_color;
+        // gl_FragColor = v_color;
+        //  gl_FragColor = vec4(color.rgb, 1);
+        vec3 rgb = color.rgb*color.a + u_color.rgb*(1.0 - color.a);
+        gl_FragColor = vec4(rgb, 1);
+      }	
+	</script>
+
+	<script type="text/javascript">
+		"use strict";
+		//same vertex shader used by both triangles
+		twgl.setDefaults({attribPrefix: "a_"});
+      var gl = twgl.getWebGLContext(document.getElementById("c"));
+     
+      var programInfo = twgl.createProgramInfo(gl, ["vs", "fs"]);
+
+      
+
+      var arrays = {
+        position: [
+          0.3, -0.25, -0.0,
+          -0.3, -0.25, -0.1,
+          0.0, 0.5, -0.0,
+        ],
+        color: [            // 0.0 - 1.0 range for colors
+          0,1,0.5,1,
+          1,1,1,1,
+          1,0,1,0,
+        ],
+        texcoord: [
+          .3,.3,
+          .3,.7,
+          .7,.3,
+        ],
+        indices:  [ //doesn't become attached to an attribute
+          0, 1, 2,
+        ],
+      };
+
+      var arrays2 = {
+        position: [
+          0.3, 0.25, -0.0,    //vertices for the second triangle
+          -0.3, 0.25, -0.0,
+          0.0, -0.5, -0.0,
+        ],
+        color: [            // 0.0 - 1.0 range for colors
+          0,1,0.5,1,         //colors for second triangle
+          0,0,0,1,
+          1,0,1,1,
+        ],
+        indices:  [ //doesn't become attached to an attribute
+          0, 1, 2,
+        ],
+      };
+
+      // next line attaches buffer object to arrays that takes a bunch of code in OpenGL
+      // this line also attaches the array elems in "var arrays" to the attributes that have the name corresponding to the string resulting from adding the "attribPrefix" before the array elems' names
+      var bufferInfo = twgl.createBufferInfoFromArrays(gl, arrays);
+      var tex = twgl.createTexture(gl, {
+        min: gl.NEAREST,
+        mag: gl.NEAREST,
+        src: [
+          255, 255, 255, 255,
+          192, 192, 192, 255,
+          192, 192, 192, 255,
+          255, 255, 255, 255,
+        ],
+      });
+
+      var uniforms = {
+        // any constant uniforms could be placed here
+        u_tex: tex,
+      };
+
+      //this render() function basically does everything
+      function render(time) {
+        time *= 0.001; // because time given is in milliseconds
+
+        // resize if needed and clear old content
+        twgl.resizeCanvasToDisplaySize(gl.canvas);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+        gl.enable(gl.DEPTH_TEST);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        //set the uniform by putting values into uniform object
+        uniforms.u_color = [
+          Math.cos(time)*0.5+0.5,
+          Math.cos(time/Math.PI)*0.5+0.5,
+          Math.cos(time/Math.E)*0.5+0.5,
+          1
+        ];
+
+        uniforms.u_modelView = twgl.m4.rotationY(time);
+
+        gl.useProgram(programInfo.program);
+        twgl.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+        twgl.setUniforms(programInfo, uniforms);
+        gl.drawElements(gl.TRIANGLES, bufferInfo.numElements, gl.UNSIGNED_SHORT, 0);
+       
+        requestAnimationFrame(render);
+      }
+      requestAnimationFrame(render);
+
+	</script>
 </body>
 
 </html>
