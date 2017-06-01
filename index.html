@@ -44,7 +44,7 @@
 	</p>
 
 	<p> 
-		My name is Bryan Phan. I will be graduating from the University of Virginia on May 19, 2017 with a BA in Computer Science and a BA in Linguistics. 
+		My name is Bryan Phan. I graduated from the University of Virginia on May 20, 2017 with a BA in Computer Science and a BA in Linguistics. 
 	</p>
 
 	<p>
@@ -70,10 +70,9 @@
       
 
       	void main() {
-        	//gl_Position = a_position;
         	gl_Position = u_modelView * a_position;
-        	v_color = a_color; //set per vertex and read per pixel -> this moves the value forward to be used by the next shader
-        	v_texcoord = a_texcoord;
+        	//v_color = a_color; 
+        	//v_texcoord = a_texcoord;
       	}
 	</script>
 
@@ -88,9 +87,9 @@
       uniform sampler2D u_tex;
 
       void main() {
-       // vec4 color = texture2D(u_tex, v_texcoord);
-       // vec3 rgb = color.rgb*color.a + u_color.rgb*(1.0 - color.a);
-       // gl_FragColor = vec4(rgb, 1);
+        //vec4 color = texture2D(u_tex, v_texcoord);
+        //vec3 rgb = color.rgb*color.a + u_color.rgb*(1.0 - color.a);
+        //gl_FragColor = vec4(rgb, 1);
       }	
 	</script>
 
